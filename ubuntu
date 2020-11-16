@@ -1,0 +1,24 @@
+ARG TAG=latest
+FROM ubuntu:${TAG}
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y \
+       make cmake git g++ ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev && \
+    apt-get purge --autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# create cc and c++ (CMake's default compiler) links for ccache
+RUN ln -s ../../bin/ccache /usr/lib/ccache/c++
+RUN ln -s ../../bin/ccache /usr/lib/ccache/cc
+
+
+RUN useradd -m -G sudo -u 1001 kokkos
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER kokkos
+ENV PATH=/usr/lib/ccache${PATH:+:}${PATH}
+ENV CCACHE_MAXSIZE=250M
+WORKDIR /home/kokkos
+RUN mkdir .ccache
