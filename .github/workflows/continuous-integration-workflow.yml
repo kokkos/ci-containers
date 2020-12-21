@@ -32,8 +32,6 @@ jobs:
         with:
           repository: kokkos/ci-containers/${{ matrix.config.dockerfile }}
           registry: ghcr.io
-          username: kokkos
-          password: ${{ secrets.DOCKER_TOKEN }}
           tags: ${{ matrix.config.tag }}
           dockerfile: ${{ matrix.config.dockerfile }}
           build_args: ${{ matrix.config.build_args }}
