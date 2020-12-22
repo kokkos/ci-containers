@@ -11,7 +11,7 @@ RUN apt-get update && \
 
 # The distribution comes with CMake 3.16.3 but we require at least 3.17.1
 ARG CMAKE_VERSION=3.17.1
-ENV CMAKE_DIR=/opt/cmake
+ENV CMAKE_DIR=/usr/local
 RUN CMAKE_KEY=2D2CEF1034921684 && \
     CMAKE_URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION} && \
     CMAKE_SCRIPT=cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
