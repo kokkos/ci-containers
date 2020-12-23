@@ -32,7 +32,7 @@ jobs:
         with:
           repository: kokkos/ci-containers/${{ matrix.config.dockerfile }}
           registry: ghcr.io
-          username: kokkos
+          username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
           tags: ${{ matrix.config.tag }}
           dockerfile: ${{ matrix.config.dockerfile }}
