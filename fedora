@@ -8,7 +8,7 @@ RUN ( dnf -y update || dnf -y update ) && \
       make cmake git gcc-c++ ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel openmpi-devel && \
     dnf clean all
 
-RUN if [ -n "${INTEL}" ]; then \
+RUN if [ "${INTEL}" =  "yes" ]; then \
   mkdir -p /var/lib/yum/intel-icc && \
   pushd /var/lib/yum/intel-icc && \
   wget --no-verbose http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16756/parallel_studio_xe_2020_update2_professional_edition.tgz && \
@@ -18,6 +18,11 @@ RUN if [ -n "${INTEL}" ]; then \
   printf "[icc]\nname=icc\nbaseurl=$PWD\nenabled=1" > /etc/yum.repos.d/icc.repo && \
   ( dnf -y update || dnf -y update ) && \
   dnf --nogpgcheck -y install intel-parallel-studio-xe-icc intel-parallel-studio-xe-mkl && \
+  dnf clean all; \
+elif [ "${INTEL}" = "oneapi" ]; then \
+  printf "[oneAPI]\nname=Intel oneAPI\nbaseurl=https://yum.repos.intel.com/oneapi\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" > /etc/yum.repos.d/intel-oneapi.repo && \
+  dnf -y update && \
+  dnf -y install intel-oneapi-compiler-dpcpp-cpp && \
   dnf clean all; \
 fi
 
