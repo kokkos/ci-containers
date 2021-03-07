@@ -6,7 +6,7 @@ ARG INTEL_ONEAPI
 
 RUN ( dnf -y update || dnf -y update ) && \
     dnf -y install \
-      make cmake git gcc-c++ ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel openmpi-devel && \
+      make cmake git gcc-c++ ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel && \
     dnf clean all
 
 RUN if [ "${INTEL}" =  "yes" ]; then \
@@ -32,7 +32,7 @@ fi
 RUN useradd -m -G wheel -u 1001 kokkos
 RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER kokkos
-ENV PATH=/usr/lib64/ccache:/usr/lib64/openmpi/bin${PATH:+:}${PATH}
+ENV PATH=/usr/lib64/ccache${PATH:+:}${PATH}
 ENV PATH=${INTEL:+/opt/intel/bin/:}${PATH:+:}${PATH}
 ENV LD_LIBRARY_PATH=${INTEL:+/opt/intel/lib/intel64:/opt/intel/mkl/lib/intel64}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 ENV PATH=${INTEL_ONEAPI:+/opt/intel/oneapi/compiler/latest/linux/bin:}${PATH:+:}${PATH}

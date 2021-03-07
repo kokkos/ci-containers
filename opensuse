@@ -1,19 +1,15 @@
 FROM opensuse/tumbleweed:latest
 
-ARG GMX_BRANCH
-ARG GMX_DOUBLE
-
 RUN zypper dup -y && \
     zypper install -y \
-      make cmake git gcc-c++ ccache vim clang llvm wget sudo curl ninja zstd libomp-devel hwloc-devel openmpi-devel && \
+      make cmake git gcc-c++ ccache vim clang llvm wget sudo curl ninja zstd libomp-devel hwloc-devel && \
     zypper clean
-
 
 RUN groupadd -r wheel
 RUN useradd -m -G wheel -u 1001 kokkos
 RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER kokkos
-ENV PATH=/usr/lib64/ccache:/usr/lib64/mpi/gcc/openmpi2/bin${PATH:+:}${PATH}
+ENV PATH=/usr/lib64/ccache${PATH:+:}${PATH}
 ENV CCACHE_MAXSIZE=250M
 WORKDIR /home/kokkos
 RUN mkdir .ccache

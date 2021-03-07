@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-       make git g++ ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libopenmpi-dev gnupg2 && \
+       make git g++ ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev gnupg2 && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
