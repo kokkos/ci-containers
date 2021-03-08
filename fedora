@@ -17,8 +17,10 @@ RUN if [ "${INTEL}" =  "yes" ]; then \
   rm parallel_studio_xe_*.tgz && \
   cd parallel_studio_xe_*/rpm && \
   printf "[icc]\nname=icc\nbaseurl=$PWD\nenabled=1" > /etc/yum.repos.d/icc.repo && \
+  rpm --import ../PUBLIC_KEY.PUB && \
   ( dnf -y update || dnf -y update ) && \
-  dnf --nogpgcheck -y install intel-parallel-studio-xe-icc intel-parallel-studio-xe-mkl && \
+  dnf -y install findutils && \
+  dnf -y install intel-parallel-studio-xe-icc intel-parallel-studio-xe-mkl && \
   dnf clean all; \
 fi
 
