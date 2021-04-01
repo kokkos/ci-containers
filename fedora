@@ -6,7 +6,7 @@ ARG INTEL_ONEAPI
 
 RUN ( dnf -y update || dnf -y update ) && \
     dnf -y install \
-      make cmake git gcc-c++ gcc-gfortran ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel && \
+      make cmake git gcc-c++ gcc-gfortran ccache vim-minimal clang llvm flang compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel && \
     dnf clean all
 
 RUN if [ "${INTEL}" =  "yes" ]; then \
