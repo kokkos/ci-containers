@@ -2,32 +2,22 @@ ARG TAG=latest
 FROM registry.fedoraproject.org/fedora:${TAG}
 
 ARG INTEL
-ARG INTEL_ONEAPI
 
 RUN ( dnf -y update || dnf -y update ) && \
     dnf -y install \
       make cmake git gcc-c++ gcc-gfortran ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel && \
     dnf clean all
 
-RUN if [ "${INTEL}" =  "yes" ]; then \
-  mkdir -p /var/lib/yum/intel-icc && \
-  pushd /var/lib/yum/intel-icc && \
-  wget --no-verbose http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16756/parallel_studio_xe_2020_update2_professional_edition.tgz && \
-  tar -xf parallel_studio_xe_*.tgz && \
-  rm parallel_studio_xe_*.tgz && \
-  cd parallel_studio_xe_*/rpm && \
-  printf "[icc]\nname=icc\nbaseurl=$PWD\nenabled=1" > /etc/yum.repos.d/icc.repo && \
-  rpm --import ../PUBLIC_KEY.PUB && \
-  ( dnf -y update || dnf -y update ) && \
-  dnf -y install findutils && \
-  dnf -y install intel-parallel-studio-xe-icc intel-parallel-studio-xe-mkl && \
-  dnf clean all; \
+RUN source /etc/os-release && if [ "${VERSION_ID}" -gt 33 ]; then \
+    ( dnf -y update || dnf -y update ) && \
+    dnf -y install flang && \
+    dnf clean all; \
 fi
 
-RUN if [ "${INTEL_ONEAPI}" = "yes" ]; then \
+RUN if [ "${INTEL}" = "yes" ]; then \
   printf "[oneAPI]\nname=Intel oneAPI\nbaseurl=https://yum.repos.intel.com/oneapi\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" > /etc/yum.repos.d/intel-oneapi.repo && \
   dnf -y update && \
-  dnf -y install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran intel-oneapi-mkl && \
+  dnf -y install intel-oneapi-compiler-dpcpp-cpp intel-oneapi-compiler-fortran intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mkl-devel && \
   dnf clean all; \
 fi
 
@@ -35,10 +25,8 @@ RUN useradd -m -G wheel -u 1001 kokkos
 RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER kokkos
 ENV PATH=/usr/lib64/ccache${PATH:+:}${PATH}
-ENV PATH=${INTEL:+/opt/intel/bin/:}${PATH:+:}${PATH}
-ENV LD_LIBRARY_PATH=${INTEL:+/opt/intel/lib/intel64:/opt/intel/mkl/lib/intel64}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
-ENV PATH=${INTEL_ONEAPI:+/opt/intel/oneapi/compiler/latest/linux/bin:}${PATH:+:}${PATH}
-ENV LD_LIBRARY_PATH=${INTEL_ONEAPI:+/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64:/opt/intel/oneapi/mkl/latest/lib/intel64}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
+ENV PATH=${INTEL:+/opt/intel/oneapi/compiler/latest/linux/bin:/opt/intel/oneapi/compiler/latest/linux/bin/intel64}${PATH:+:}${PATH}
+ENV LD_LIBRARY_PATH=${INTEL:+/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64:/opt/intel/oneapi/mkl/latest/lib/intel64}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 ENV CCACHE_MAXSIZE=250M
 WORKDIR /home/kokkos
 RUN mkdir .ccache
