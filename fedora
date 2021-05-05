@@ -9,6 +9,12 @@ RUN ( dnf -y update || dnf -y update ) && \
       make cmake git gcc-c++ gcc-gfortran ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel && \
     dnf clean all
 
+RUN source /etc/os-release && if [ "${VERSION_ID}" -gt 33 ]; then \
+    ( dnf -y update || dnf -y update ) && \
+    dnf -y install flang && \
+    dnf clean all; \
+fi
+
 RUN if [ "${INTEL}" =  "yes" ]; then \
   mkdir -p /var/lib/yum/intel-icc && \
   pushd /var/lib/yum/intel-icc && \
