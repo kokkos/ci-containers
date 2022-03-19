@@ -5,9 +5,34 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-       make git g++ gfortran ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libomp-dev gnupg2  cmake && \
+       make git g++ gfortran ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libomp-dev gnupg2 && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
+
+# The ubuntu 20.04 comes with CMake 3.16.3 but we require at least 3.17.1
+RUN . /etc/os-release && if  [ -n "${VERSION_ID##20*}" ]; then \
+  apt-get update && \
+  apt-get install -y cmake && \
+  apt-get purge --autoremove -y && \
+  rm -rf /var/lib/apt/lists/*; \
+else \
+  CMAKE_VERSION=3.17.1 && \
+  CMAKE_DIR=/usr/local && \
+  CMAKE_KEY=2D2CEF1034921684 && \
+  CMAKE_URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION} && \
+  CMAKE_SCRIPT=cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
+  CMAKE_SHA256=cmake-${CMAKE_VERSION}-SHA-256.txt && \
+  wget --quiet ${CMAKE_URL}/${CMAKE_SHA256} && \
+  wget --quiet ${CMAKE_URL}/${CMAKE_SHA256}.asc && \
+  wget --quiet ${CMAKE_URL}/${CMAKE_SCRIPT} && \
+  #gpg2 --keyserver pool.sks-keyservers.net --recv-keys ${CMAKE_KEY} && \
+  #gpg2 --verify ${CMAKE_SHA256}.asc ${CMAKE_SHA256} && \
+  grep ${CMAKE_SCRIPT} ${CMAKE_SHA256} | sha256sum --check && \
+  mkdir -p ${CMAKE_DIR} && \
+  sh ${CMAKE_SCRIPT} --skip-license --prefix=${CMAKE_DIR} && \
+  rm cmake*; \
+fi
+ENV PATH=/usr/local/bin:$PATH
 
 # create cc and c++ (CMake's default compiler) links for ccache
 RUN ln -s ../../bin/ccache /usr/lib/ccache/c++
