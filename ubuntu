@@ -33,6 +33,7 @@ else \
   rm cmake*; \
 fi
 ENV PATH=/usr/local/bin:$PATH
+RUN cmake --version
 
 # create cc and c++ (CMake's default compiler) links for ccache
 RUN ln -s ../../bin/ccache /usr/lib/ccache/c++
@@ -45,4 +46,3 @@ ENV PATH=/usr/lib/ccache${PATH:+:}${PATH}
 ENV CCACHE_MAXSIZE=250M
 WORKDIR /home/kokkos
 RUN mkdir .ccache
-RUN cmake --version
