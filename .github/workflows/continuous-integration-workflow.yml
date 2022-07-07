@@ -22,7 +22,7 @@ jobs:
           - {dockerfile: 'ubuntu',   tag: 'devel',            build_args: 'TAG=devel', continue-on-error: 'true'}
           - {dockerfile: 'ubuntu',   tag: '18.04',            build_args: 'TAG=18.04'}
           - {dockerfile: 'opensuse', tag: 'latest'}
-          - {dockerfile: 'fedora',   tag: 'intel',            build_args: 'TAG=34,INTEL=yes'}
+          - {dockerfile: 'fedora',   tag: 'intel',            build_args: 'TAG=35,INTEL=yes'}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout out code
