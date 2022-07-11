@@ -20,7 +20,6 @@ jobs:
           - {dockerfile: 'ubuntu',   tag: 'latest'}
           - {dockerfile: 'ubuntu',   tag: 'rolling',          build_args: 'TAG=rolling'}
           - {dockerfile: 'ubuntu',   tag: 'devel',            build_args: 'TAG=devel', continue-on-error: 'true'}
-          - {dockerfile: 'ubuntu',   tag: '18.04',            build_args: 'TAG=18.04'}
           - {dockerfile: 'opensuse', tag: 'latest'}
           - {dockerfile: 'fedora',   tag: 'intel',            build_args: 'TAG=35,INTEL=yes'}
     runs-on: ubuntu-latest
