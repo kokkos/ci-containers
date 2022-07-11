@@ -5,27 +5,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-       make git g++ gfortran ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libomp-dev gnupg2 && \
+       make git g++ gfortran ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libomp-dev gnupg2 cmake && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
-
-# The distribution comes with CMake 3.16.3 but we require at least 3.17.1
-ARG CMAKE_VERSION=3.17.1
-ENV CMAKE_DIR=/usr/local
-RUN CMAKE_KEY=2D2CEF1034921684 && \
-    CMAKE_URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION} && \
-    CMAKE_SCRIPT=cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
-    CMAKE_SHA256=cmake-${CMAKE_VERSION}-SHA-256.txt && \
-    wget --quiet ${CMAKE_URL}/${CMAKE_SHA256} && \
-    wget --quiet ${CMAKE_URL}/${CMAKE_SHA256}.asc && \
-    wget --quiet ${CMAKE_URL}/${CMAKE_SCRIPT} && \
-    #gpg2 --keyserver pool.sks-keyservers.net --recv-keys ${CMAKE_KEY} && \
-    #gpg2 --verify ${CMAKE_SHA256}.asc ${CMAKE_SHA256} && \
-    grep ${CMAKE_SCRIPT} ${CMAKE_SHA256} | sha256sum --check && \
-    mkdir -p ${CMAKE_DIR} && \
-    sh ${CMAKE_SCRIPT} --skip-license --prefix=${CMAKE_DIR} && \
-    rm cmake*
-ENV PATH=${CMAKE_DIR}/bin:$PATH
 
 # create cc and c++ (CMake's default compiler) links for ccache
 RUN ln -s ../../bin/ccache /usr/lib/ccache/c++
