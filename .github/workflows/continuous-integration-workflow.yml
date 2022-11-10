@@ -39,6 +39,6 @@ jobs:
         with:
           tags: ghcr.io/kokkos/ci-containers/${{ matrix.config.dockerfile }}:${{ matrix.config.tag }}
           file: ${{ matrix.config.dockerfile }}
-          build_args: ${{ matrix.config.build_args }}
+          build-args: ${{ matrix.config.build_args }}
           pull: true
           push: ${{ github.event_name == 'push' ||  github.event_name == 'schedule' }}
