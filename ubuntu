@@ -9,11 +9,6 @@ RUN apt-get update && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-# create cc and c++ (CMake's default compiler) links for ccache
-RUN ln -s ../../bin/ccache /usr/lib/ccache/c++
-RUN ln -s ../../bin/ccache /usr/lib/ccache/cc
-
-
 RUN useradd -m -G sudo -u 1001 kokkos
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER kokkos
