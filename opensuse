@@ -12,4 +12,3 @@ USER kokkos
 ENV PATH=/usr/lib64/ccache${PATH:+:}${PATH}
 ENV CCACHE_MAXSIZE=250M
 WORKDIR /home/kokkos
-RUN mkdir .ccache
