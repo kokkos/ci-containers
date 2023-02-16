@@ -9,6 +9,5 @@ RUN groupadd -r wheel
 RUN useradd -m -G wheel -u 1001 kokkos
 RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER kokkos
-ENV PATH=/usr/lib64/ccache${PATH:+:}${PATH}
 ENV CCACHE_MAXSIZE=250M
 WORKDIR /home/kokkos
