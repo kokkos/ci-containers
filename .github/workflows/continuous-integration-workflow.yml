@@ -11,22 +11,23 @@ on:
 
 jobs:
   CI:
-    continue-on-error: ${{ matrix.config.continue-on-error == 'true' }}
     strategy:
-      matrix:
-        config:
-          - {dockerfile: 'fedora',   tag: 'latest'}
-          - {dockerfile: 'fedora',   tag: 'rawhide',          build_args: 'TAG=rawhide', continue-on-error: 'true'}
-          - {dockerfile: 'ubuntu',   tag: 'latest'}
-          - {dockerfile: 'ubuntu',   tag: 'rolling',          build_args: 'TAG=rolling'}
-          - {dockerfile: 'ubuntu',   tag: 'devel',            build_args: 'TAG=devel', continue-on-error: 'true'}
-          - {dockerfile: 'ubuntu',   tag: 'intel',            build_args: 'TAG=22.04,INTEL=yes', continue-on-error: 'true'}
-          - {dockerfile: 'opensuse', tag: 'latest'}
-          - {dockerfile: 'fedora',   tag: 'intel',            build_args: 'TAG=37,INTEL=yes', continue-on-error: 'true'}
+        matrix:
+          config:
+            - {dockerfile: 'fedora',   tag: 'latest'}
+            - {dockerfile: 'fedora',   tag: 'rawhide',  build_args: 'TAG=rawhide',  continue-on-error: 'true'}
+            - {dockerfile: 'ubuntu',   tag: 'latest'}
+            - {dockerfile: 'ubuntu',   tag: 'rolling',  build_args: 'TAG=rolling'}
+            - {dockerfile: 'ubuntu',   tag: 'devel',    build_args: 'TAG=devel',    continue-on-error: 'true'}
+            - {dockerfile: 'ubuntu',   tag: 'intel',    build_args: 'TAG=22.04,INTEL=yes', continue-on-error: 'true'}
+            - {dockerfile: 'opensuse', tag: 'latest'}
+            - {dockerfile: 'fedora',   tag: 'intel',    build_args: 'TAG=38,INTEL=yes',    cmake_args: '-DCMAKE_CXX_COMPILER=icpc',  continue-on-error: 'true'}
+            - {dockerfile: 'fedora',   tag: 'intel',    build_args: 'TAG=38,INTEL=yes',    cmake_args: '-DCMAKE_CXX_COMPILER=icpx -DCMAKE_CXX_FLAGS=-fp-model=precise',  continue-on-error: 'true'}
+    continue-on-error: ${{ matrix.config.continue-on-error == 'true' }}
+    env:
+      docker-tag: ghcr.io/kokkos/ci-containers/${{ matrix.config.dockerfile }}:${{ matrix.config.tag }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout out code
-        uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to Github Container Registry
@@ -35,18 +36,44 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }} 
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Convert build_args
         id: build_args
         run: |
-          echo "args<<EOF" >> $GITHUB_OUTPUT 
+          echo "args<<EOF" >> $GITHUB_OUTPUT
           echo ${{ matrix.config.build_args }} | sed 's/,/\n/' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-      - name: Build and Push Docker images for Github Container Registry
-        uses: docker/build-push-action@v3        
+      - name: Build new image and Load it into Docker for testing
+        uses: docker/build-push-action@v4
         with:
-          tags: ghcr.io/kokkos/ci-containers/${{ matrix.config.dockerfile }}:${{ matrix.config.tag }}
+          tags: ${{ env.docker-tag }}
           file: ${{ matrix.config.dockerfile }}
           build-args: ${{ steps.build_args.outputs.args }}
           pull: true
-          push: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
+          load: true
+      - name: Checkout kokkos
+        uses: actions/checkout@v3
+        with:
+          repository: kokkos/kokkos
+          path: kokkos
+      - name: Build and Test Kokkos using updated image
+        run: |
+          docker run -t --rm -v ${{ github.workspace }}/kokkos:/kokkos -w /kokkos ${{ env.docker-tag }} \
+            sh -c \
+              "cmake -B builddir \
+                ${{ matrix.config.cmake_args }} \
+                -DKokkos_ENABLE_HWLOC=ON \
+                -DKokkos_ENABLE_BENCHMARKS=ON \
+                -DKokkos_ENABLE_EXAMPLES=ON \
+                -DKokkos_ENABLE_TESTS=ON \
+                -DKokkos_ENABLE_SERIAL=ON \
+                -DKokkos_ENABLE_OPENMP=ON && \
+              cmake --build builddir --parallel 2 && \
+              ctest --test-dir builddir --output-on-failure"
+      - name: Push the image into Github Container Registry
+        uses: docker/build-push-action@v4
+        if: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
+        with:
+          tags: ${{ env.docker-tag }}
+          file: ${{ matrix.config.dockerfile }}
+          push: true
