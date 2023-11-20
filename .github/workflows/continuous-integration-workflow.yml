@@ -49,6 +49,7 @@ jobs:
           file: ${{ matrix.config.dockerfile }}
           build-args: ${{ steps.build_args.outputs.args }}
           pull: true
+          push: false
           load: true
       - name: Checkout kokkos
         uses: actions/checkout@v3
