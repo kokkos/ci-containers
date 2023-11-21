@@ -19,7 +19,7 @@ jobs:
             - {dockerfile: 'ubuntu',   tag: 'latest'}
             - {dockerfile: 'ubuntu',   tag: 'rolling',  build_args: 'TAG=rolling'}
             - {dockerfile: 'ubuntu',   tag: 'devel',    build_args: 'TAG=devel',    continue-on-error: 'true'}
-            - {dockerfile: 'ubuntu',   tag: 'intel',    build_args: 'TAG=22.04,INTEL=yes', continue-on-error: 'true'}
+            - {dockerfile: 'ubuntu',   tag: 'intel',    build_args: 'TAG=22.04,INTEL=yes', cmake_args: '-DCMAKE_CXX_COMPILER=icpx -DCMAKE_CXX_FLAGS=-fp-model=precise', continue-on-error: 'true'}
             - {dockerfile: 'opensuse', tag: 'latest'}
             - {dockerfile: 'fedora',   tag: 'intel',    build_args: 'TAG=37,INTEL=yes',    cmake_args: '-DCMAKE_CXX_COMPILER=icpc',  continue-on-error: 'true'}
     continue-on-error: ${{ matrix.config.continue-on-error == 'true' }}
