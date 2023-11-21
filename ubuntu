@@ -1,6 +1,8 @@
 ARG TAG=latest
 FROM ubuntu:${TAG}
 
+ARG INTEL
+
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -9,8 +11,18 @@ RUN apt-get update && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
+RUN if [ "${INTEL}" = "yes" ]; then \
+  wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null && \
+  echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list && \
+  apt-get update && \
+  apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mkl-devel && \
+  apt-get clean; \
+fi
+
 RUN useradd -m -G sudo -u 1001 kokkos
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER kokkos
+ENV PATH=${INTEL:+/opt/intel/oneapi/compiler/latest/linux/bin:/opt/intel/oneapi/compiler/latest/linux/bin/intel64}${PATH:+:}${PATH}
+ENV LD_LIBRARY_PATH=${INTEL:+/opt/intel/oneapi/compiler/latest/linux/compiler/lib/intel64:/opt/intel/oneapi/mkl/latest/lib/intel64}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 ENV CCACHE_MAXSIZE=250M
 WORKDIR /home/kokkos
