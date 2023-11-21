@@ -5,7 +5,7 @@ ARG INTEL
 
 RUN ( dnf -y update || dnf -y update ) && \
     dnf -y install \
-      make cmake git gcc-c++ gcc-gfortran ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel flang flang-devel && \
+      make cmake git gcc-c++ gcc-gfortran ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel flang flang-devel hpx-devel && \
     dnf clean all
 
 RUN if [ "${INTEL}" = "yes" ]; then \
