@@ -82,4 +82,5 @@ jobs:
         with:
           tags: ${{ env.docker-tag }}
           file: ${{ matrix.config.dockerfile }}
+          build-args: ${{ steps.build_args.outputs.args }}
           push: true
