@@ -48,7 +48,7 @@ jobs:
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /usr/share/dotnet
       - name: Build new image and Load it into Docker for testing
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           tags: ${{ env.docker-tag }}
           file: ${{ matrix.config.dockerfile }}
@@ -77,7 +77,7 @@ jobs:
               cmake --build builddir --parallel 2 && \
               ctest --test-dir builddir --output-on-failure"
       - name: Push the image into GitHub Container Registry
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         if: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
         with:
           tags: ${{ env.docker-tag }}
