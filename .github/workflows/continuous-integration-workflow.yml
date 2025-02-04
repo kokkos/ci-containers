@@ -77,7 +77,7 @@ jobs:
                 -DKokkos_ENABLE_OPENMP=ON && \
               cmake --build builddir --parallel 2 && \
               ctest --test-dir builddir --output-on-failure"
-          sed -i '26s/$/ /' ${{ matrix.config.dockerfile }} # workaround for kokkos/ci-containers#56 
+          sed -i '26s/$/ /' ${{ matrix.config.dockerfile }} # force rebuild by adding a space (kokkos/ci-containers#56) 
       - name: Push the image into GitHub Container Registry
         uses: docker/build-push-action@v6
         with:
