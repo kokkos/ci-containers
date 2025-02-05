@@ -26,8 +26,6 @@ jobs:
       docker-tag: ghcr.io/kokkos/ci-containers/${{ matrix.config.dockerfile }}:${{ matrix.config.tag }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout CI repo
-        uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GitHub Container Registry
@@ -77,7 +75,6 @@ jobs:
                 -DKokkos_ENABLE_OPENMP=ON && \
               cmake --build builddir --parallel 2 && \
               ctest --test-dir builddir --output-on-failure"
-          sed -i '26s/$/ /' ${{ matrix.config.dockerfile }} # force rebuild by adding a space (kokkos/ci-containers#56) 
       - name: Push the image into GitHub Container Registry
         uses: docker/build-push-action@v6
         with:
@@ -85,3 +82,5 @@ jobs:
           file: ${{ matrix.config.dockerfile }}
           build-args: ${{ steps.build_args.outputs.args }}
           push: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
+          # workaround for kokkos/ci-containers#56
+          no-cache: true
