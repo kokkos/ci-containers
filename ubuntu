@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-       make git g++ gfortran ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libomp-dev gnupg2 cmake && \
+       make git g++ gfortran ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libomp-dev gnupg2 cmake libgtest-dev clang-tidy gcc-multilib g++-multilib gfortran-multilib && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
