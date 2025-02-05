@@ -1,25 +1,10 @@
 ARG TAG=latest
 FROM registry.fedoraproject.org/fedora:${TAG}
 
-ARG INTEL
-
 RUN ( dnf -y update || dnf -y update ) && \
     dnf -y install \
-      make cmake git gcc-c++ gcc-gfortran ccache vim-minimal clang llvm compiler-rt sudo clang-tools-extra ninja-build libomp-devel wget zstd hwloc-devel flang hpx-devel && \
+      make ccache clang clang-tools-extra cmake compiler-rt flang gcc-c++ gcc-gfortran git hpx-devel hwloc-devel libomp-devel llvm ninja-build sudo vim-minimal wget zstd && \
     dnf clean all
-
-RUN source /etc/os-release && if [ "${VERSION_ID}" -lt 40 ]; then \
-    ( dnf -y update || dnf -y update ) && \
-    dnf -y install flang-devel && \
-    dnf clean all; \
-fi
-
-RUN if [ "${INTEL}" = "yes" ]; then \
-  printf "[oneAPI]\nname=Intel oneAPI\nbaseurl=https://yum.repos.intel.com/oneapi\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB" > /etc/yum.repos.d/intel-oneapi.repo && \
-  dnf -y update && \
-  dnf -y install intel-oneapi-compiler-fortran intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic && \
-  dnf clean all; \
-fi
 
 RUN useradd -m -G wheel -u 1001 kokkos
 RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
