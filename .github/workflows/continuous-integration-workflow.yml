@@ -83,12 +83,12 @@ jobs:
               ctest --test-dir builddir --output-on-failure"
       - name: Push the image into GitHub Container Registry
         uses: docker/build-push-action@v6
-        if: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
         with:
           tags: ${{ env.docker-tag }}
           file: ${{ matrix.config.dockerfile }}
           build-args: ${{ steps.build_args.outputs.args }}
-          push: true
+          push: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
+          provenance: false
 
   merge-docker-manifest:
     runs-on: ubuntu-latest
