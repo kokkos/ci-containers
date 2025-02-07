@@ -7,12 +7,19 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-       make git g++ gfortran ccache vim clang llvm wget sudo curl ninja-build clang-format zstd libhwloc-dev libomp-dev gnupg2 cmake libgtest-dev clang-tidy && \
+       ccache clang clang-format clang-tidy cmake curl g++ gfortran git gnupg2 libgtest-dev libhwloc-dev libomp-dev llvm make ninja-build sudo vim wget zstd && \
     if [ "$(uname -m)" = "x86_64" ]; then \
       apt-get install -y gcc-multilib g++-multilib gfortran-multilib; \
     fi && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
+
+RUN . /etc/os-release && if [ "${VERSION_ID}" != "22.04" ]; then \
+  apt-get update && \
+  apt-get install -y flang && \
+  apt-get purge --autoremove -y && \
+  apt-get clean; \
+fi
 
 RUN if [ "${INTEL}" = "yes" ]; then \
   wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null && \
