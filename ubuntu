@@ -14,18 +14,17 @@ RUN apt-get update && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-RUN . /etc/os-release && if [ "${VERSION_ID}" != "22.04" ]; then \
-  apt-get update && \
-  apt-get install -y flang && \
-  apt-get purge --autoremove -y && \
-  apt-get clean; \
-fi
-
+# intel build happens on 22.04 LTS, which does not have flang, install flang unconditionally once intel gets bumped
 RUN if [ "${INTEL}" = "yes" ]; then \
   wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null && \
   echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list && \
   apt-get update && \
   apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mkl-devel && \
+  apt-get clean; \
+else \
+  apt-get update && \
+  apt-get install -y flang && \
+  apt-get purge --autoremove -y && \
   apt-get clean; \
 fi
 
