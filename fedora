@@ -4,6 +4,7 @@ FROM registry.fedoraproject.org/fedora:${TAG}
 RUN ( dnf -y update || dnf -y update ) && \
     dnf -y install \
       make ccache clang clang-tools-extra cmake compiler-rt flang gcc-c++ gcc-gfortran git hpx-devel hwloc-devel libomp-devel llvm ninja-build sudo vim-minimal wget zstd && \
+    dnf -y upgrade --enablerepo=updates-testing --refresh --advisory=FEDORA-2025-7ac77a9436 && \
     dnf clean all
 
 RUN useradd -m -G wheel -u 1001 kokkos
