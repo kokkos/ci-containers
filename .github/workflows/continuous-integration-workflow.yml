@@ -20,7 +20,8 @@ jobs:
           config:
             - {dockerfile: 'fedora',   tag: 'latest-amd64'}
             - {dockerfile: 'fedora',   tag: 'latest-arm64', arm: 'true'}
-            - {dockerfile: 'fedora',   tag: 'rawhide',  build_args: 'TAG=rawhide',  continue-on-error: 'true'}
+            - {dockerfile: 'fedora',   tag: 'rawhide-amd64',  build_args: 'TAG=rawhide',  continue-on-error: 'true'}
+            - {dockerfile: 'fedora',   tag: 'rawhide-arm64',  build_args: 'TAG=rawhide',  continue-on-error: 'true', arm: 'true'}
             - {dockerfile: 'ubuntu',   tag: 'latest-amd64'}
             - {dockerfile: 'ubuntu',   tag: 'latest-arm64', arm: 'true'}
             - {dockerfile: 'ubuntu',   tag: 'rolling',  build_args: 'TAG=rolling'}
@@ -97,7 +98,9 @@ jobs:
         matrix:
           config:
             - {dockerfile: 'fedora',   tag: 'latest'}
+            - {dockerfile: 'fedora',   tag: 'rawhide', continue-on-error: 'true'}
             - {dockerfile: 'ubuntu',   tag: 'latest'}
+    continue-on-error: ${{ matrix.config.continue-on-error == 'true' }}
     env:
       docker-tag: ghcr.io/kokkos/ci-containers/${{ matrix.config.dockerfile }}:${{ matrix.config.tag }}
     steps:
