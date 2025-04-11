@@ -116,5 +116,5 @@ jobs:
         uses: Noelware/docker-manifest-action@master
         with:
           inputs: ${{ env.docker-tag }}
-          images: ${{ env.docker-tag }}-amd64,${{ env.docker-tag }}-arm64
+          tags: ${{ env.docker-tag }}-amd64,${{ env.docker-tag }}-arm64
           push: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
