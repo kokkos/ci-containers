@@ -113,8 +113,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Create and push manifest images to Github Container Registry
         if: github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' )
-        uses: Noelware/docker-manifest-action@master
+        uses: Noelware/docker-manifest-action@0.4.3
         with:
           inputs: ${{ env.docker-tag }}
-          tags: ${{ env.docker-tag }}-amd64,${{ env.docker-tag }}-arm64
+          images: ${{ env.docker-tag }}-amd64,${{ env.docker-tag }}-arm64
           push: ${{ github.repository_owner == 'kokkos' && ( github.event_name == 'push' ||  github.event_name == 'schedule' ) }}
