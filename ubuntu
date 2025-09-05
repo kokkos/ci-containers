@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-       ccache clang clang-format clang-tidy cmake curl g++ gfortran git gnupg2 libgtest-dev libhwloc-dev libomp-dev llvm make ninja-build sudo vim wget zstd && \
+       ccache clang clang-format clang-tidy cmake curl g++ gfortran git gnupg2 libgtest-dev libhwloc-dev libomp-dev llvm make ninja-build sudo vim wget zstd g++-12 && \
     if [ "$(uname -m)" = "x86_64" ]; then \
       apt-get install -y gcc-multilib g++-multilib gfortran-multilib; \
     fi && \
