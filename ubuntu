@@ -26,7 +26,7 @@ fi
 RUN useradd -m -G sudo -u 1001 kokkos
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER kokkos
-ENV ICPX_PATH=$(dirname "$(find /opt/intel/oneapi -name "icpx")")
+ENV ICPX_PATH=${INTEL:+$(dirname "$(find /opt/intel/oneapi -name "icpx")")}
 ENV PATH=${INTEL:+${ICPX_PATH}:${ICPX_PATH}/intel64}${PATH:+:}${PATH}
 ENV LD_LIBRARY_PATH=${INTEL:+${ICPX_PATH}/../compiler/lib/intel64:/opt/intel/oneapi/mkl/latest/lib/intel64}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 ENV CCACHE_MAXSIZE=250M
