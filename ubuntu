@@ -25,6 +25,7 @@ fi
 
 RUN useradd -m -G sudo -u 1001 kokkos
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN ls /opt/intel/oneapi/compiler/
 USER kokkos
 ENV ICPX_PATH=${INTEL:+$(dirname "$(find /opt/intel/oneapi -name "icpx")")}
 ENV PATH=${INTEL:+${ICPX_PATH}:${ICPX_PATH}/intel64}${PATH:+:}${PATH}
