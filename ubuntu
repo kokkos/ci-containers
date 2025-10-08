@@ -7,23 +7,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y \
-       ccache clang clang-format clang-tidy cmake curl g++ gfortran git gnupg2 libgtest-dev libhwloc-dev libomp-dev llvm make ninja-build sudo vim wget zstd g++-12 && \
+       ccache clang clang-format clang-tidy cmake curl flang g++ gfortran git gnupg2 libgtest-dev libhwloc-dev libomp-dev llvm make ninja-build sudo vim wget zstd g++-12 && \
     if [ "$(uname -m)" = "x86_64" ]; then \
       apt-get install -y gcc-multilib g++-multilib gfortran-multilib; \
     fi && \
     apt-get purge --autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-# intel build happens on 22.04 LTS, which does not have flang, install flang unconditionally once intel gets bumped
 RUN if [ "${INTEL}" = "yes" ]; then \
   wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null && \
   echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list && \
   apt-get update && \
-  apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mkl-devel && \
-  apt-get clean; \
-else \
-  apt-get update && \
-  apt-get install -y flang && \
+  apt-get install -y intel-ocloc intel-oneapi-compiler-dpcpp-cpp intel-oneapi-mkl-devel && \
   apt-get purge --autoremove -y && \
   apt-get clean; \
 fi
