@@ -63,7 +63,9 @@ jobs:
         run: |
           docker run -t --rm -v ${{ github.workspace }}/kokkos:/kokkos -w /kokkos ${{ env.docker-tag }} \
             sh -c \
-              "cmake -B builddir \
+              "echo ${PATH} && \
+               find /opt/intel/oneapi -name "icpx" && \
+               cmake -B builddir \
                 ${{ matrix.config.cmake_args }} \
                 -DKokkos_ENABLE_HWLOC=ON \
                 -DKokkos_ENABLE_BENCHMARKS=ON \
