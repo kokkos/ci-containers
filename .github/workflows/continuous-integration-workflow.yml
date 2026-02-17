@@ -18,16 +18,7 @@ jobs:
     strategy:
         matrix:
           config:
-            - {dockerfile: 'fedora',   tag: 'latest-amd64'}
-            - {dockerfile: 'fedora',   tag: 'latest-arm64', arm: 'true'}
-            - {dockerfile: 'fedora',   tag: 'rawhide-amd64',  build_args: 'TAG=rawhide',  continue-on-error: 'true'}
-            - {dockerfile: 'fedora',   tag: 'rawhide-arm64',  build_args: 'TAG=rawhide',  continue-on-error: 'true', arm: 'true'}
-            - {dockerfile: 'ubuntu',   tag: 'latest-amd64'}
-            - {dockerfile: 'ubuntu',   tag: 'latest-arm64', arm: 'true'}
-            - {dockerfile: 'ubuntu',   tag: 'rolling',  build_args: 'TAG=rolling'}
-            - {dockerfile: 'ubuntu',   tag: 'devel',    build_args: 'TAG=devel',    continue-on-error: 'true'}
-            - {dockerfile: 'ubuntu',   tag: 'intel',    build_args: 'TAG=22.04,INTEL=yes', cmake_args: '-DCMAKE_CXX_COMPILER=icpx -DCMAKE_CXX_FLAGS=-fp-model=precise', continue-on-error: 'true'}
-            - {dockerfile: 'opensuse', tag: 'latest'}
+            - {dockerfile: 'ubuntu',   tag: 'intel',    build_args: 'TAG=24.04,INTEL=yes', cmake_args: '-DCMAKE_CXX_COMPILER=icpx -DCMAKE_CXX_FLAGS=-fp-model=precise', continue-on-error: 'true'}
     continue-on-error: ${{ matrix.config.continue-on-error == 'true' }}
     env:
       docker-tag: ghcr.io/kokkos/ci-containers/${{ matrix.config.dockerfile }}:${{ matrix.config.tag }}
@@ -72,7 +63,9 @@ jobs:
         run: |
           docker run -t --rm -v ${{ github.workspace }}/kokkos:/kokkos -w /kokkos ${{ env.docker-tag }} \
             sh -c \
-              "cmake -B builddir \
+              "echo ${PATH} && \
+               find /opt/intel/oneapi -name "icpx" && \
+               cmake -B builddir \
                 ${{ matrix.config.cmake_args }} \
                 -DKokkos_ENABLE_HWLOC=ON \
                 -DKokkos_ENABLE_BENCHMARKS=ON \
